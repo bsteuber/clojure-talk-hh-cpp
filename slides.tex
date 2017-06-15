@@ -249,7 +249,7 @@ v                         ; => [1 2 3]
 (->> cart-items
      (filter :available?)
      (map :price)
-     (reduce +))                 ; 502
+     (reduce +))                 ; => 502
 
 \end{verbatim}
   \end{block}
@@ -294,6 +294,67 @@ v                         ; => [1 2 3]
 \end{frame}
 
 \section{Nebenläufigkeit mit core.async}
+
+\begin{frame}{core.async}
+  \begin{itemize}
+  \item core.async
+    \begin{itemize}
+    \item Library für asynchrone Programmierung
+    \item Communicating Sequential Processes (Hoare)
+    \item Von der Sprache Go kopiert (und verbessert)
+    \end{itemize}
+  \item Channels
+    \begin{itemize}
+    \item Threads können in channels schreiben oder lesen
+    \item Blockieren bis read und write da sind
+    \item Buffer sind möglich
+    \end{itemize}
+  \item go-Blöcke
+    \begin{itemize}
+    \item Erzeugen neuen (lightweight) Thread
+    \item Nötig um auf Channels zuzugreifen
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{core.async Beispiel (1)}
+  \begin{block}{}
+\begin{verbatim}
+(defn consumer [ch]
+  (go
+    (loop
+      (println (<! ch))
+      (recur))))
+
+
+(defn producer [ch]
+  (go
+    (loop [i 1]
+      (>! ch i)
+      (recur (inc i)))))
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{core.async Beispiel (2)}
+  \begin{block}{}
+\begin{verbatim}
+(defn run []
+  (let [ch (chan 10)]     ; Buffer size 10
+    (consumer ch)
+    (producer ch)))
+
+
+; =>
+; 1
+; 2
+; 3
+; 4
+; ...
+\end{verbatim}
+  \end{block}
+\end{frame}
+
 
 \section{Reactive UI Programmierung mit Reagent in ClojureScript}
 \end{document}
