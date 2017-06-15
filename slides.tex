@@ -1,0 +1,299 @@
+% Created 2017-06-14 Wed 19:36
+\documentclass[presentation]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fixltx2e}
+\usepackage{graphicx}
+\usepackage{longtable}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{marvosym}
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{hyperref}
+\tolerance=1000
+\usetheme{Warsaw}
+\author{Benjamin Teuber}
+\date{\today}
+\title{Clojure-Einführung}
+\begin{document}
+
+\maketitle
+\begin{frame}{Outline}
+\tableofcontents
+\end{frame}
+
+\def\cpp{C++}
+
+\section{Clojure-Einführung}
+
+\begin{frame}{Grundsätzliches über Clojure}
+  Eigenschaften von Clojure
+  \begin{itemize}
+  \item Funktionale Sprache
+  \item Dynamisches Typsystem
+  \item Lisp-Syntax
+  \item Fokus auf Immutability
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Clojure und ClojureScript}
+  \begin{block}{Clojure}
+    \begin{itemize}
+    \item Läuft auf der JVM
+    \item Kompiliert in Java-Bytecode
+    \item Sehr gute Java Interop
+    \end{itemize}
+  \end{block}
+
+  \begin{block}{ClojureScript}
+    \begin{itemize}
+    \item Kompiliert nach JavaScript
+    \item Gut geeignet für Frontend-Programmierung
+    \item Fast komplett kompatibel zu Clojure
+    \item Direkte JS Interop
+    \end{itemize}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Dynamische Typisierung}
+  Vorteile:
+  \begin{itemize}
+  \item Viel Flexibilität
+    \begin{itemize}
+    \item Es gibt Konstrukte die schwer oder gar nicht statisch zu typisieren sind
+    \end{itemize}
+  \item Wenig Tippaufwand
+  \end{itemize}
+
+  Nachteile:
+  \begin{itemize}
+  \item Typfehler treten erst zur Laufzeit auf
+    \begin{itemize}
+    \item Editor kann nicht bereits Typprobleme anzeigen
+    \item Unit Tests helfen hier
+    \end{itemize}
+  \item Performance-Einbußen
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Performance}
+  \begin{itemize}
+  \item Generell: Programmer Time $>$ Running Time
+  \item ca. Faktor 2-3 langsamer (TODO) als C++
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Clojure-Syntax}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{\cpp}
+\begin{verbatim}
+my_function(x, y)
+
+1 + 2 + 3
+
+int my_add(int x, int y) {
+    return x + y;
+}
+\end{verbatim}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Clojure}
+\begin{verbatim}
+(my-function x y)
+
+(+ 1 2 3)
+
+(defn my-add [x y]
+  (+ x y))
+
+\end{verbatim}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Datenstrukturen}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Strings}
+\begin{verbatim}
+(def hello
+  "Hallo, Welt")
+\end{verbatim}
+      \end{block}
+      \begin{block}{Listen}
+\begin{verbatim}
+(def num-list
+   (list 1 2 3 4 5))
+\end{verbatim}
+      \end{block}
+      \begin{block}{Maps}
+\begin{verbatim}
+(def walter
+  {:first-name   "Walter"
+   :familiy-name "White"}
+\end{verbatim}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Keywords}
+\begin{verbatim}
+(def key
+  :first-name)
+\end{verbatim}
+      \end{block}
+      \begin{block}{Vektoren}
+\begin{verbatim}
+(def nums-vec
+  [1 2 3 4])
+\end{verbatim}
+      \end{block}
+      \begin{block}{Sets}
+\begin{verbatim}
+(def odd-set
+  #{1 3 5 7 9})
+\end{verbatim}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Datenstrukturen als Funktionen}
+  \begin{itemize}
+  \item Viele Datenstrukturen können direkt als Funktionen benutzt werden
+  \item Praktisch für Higher Order Funktions wie map
+  \end{itemize}
+  \begin{block}{}
+\begin{verbatim}
+  (get nums-vec 1)                 ; => 2
+  (nums-vec 1)                     ; => 2
+
+  (nums-vec 42)                    ; => Exception
+
+  (get walter :first-name)         ; => "Walter"
+  (walter :first-name)             ; => "Walter"
+  (:first-name walter)             ; => "Walter"
+
+  (walter :middle-name)            ; => nil
+  (walter :middle-name :not-found) ; => nil
+\end{verbatim}
+
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Immutable Data Structures}
+  \begin{itemize}
+  \item Alle Datenstrukturen sind immutable
+  \item Operationen liefern neue Collections zurück
+  \end{itemize}
+  \begin{block}{}
+\begin{verbatim}
+(def v [1 2 3])
+
+(conj v 4 5 6)            ; => [1 2 3 4 5 6]
+
+v                         ; => [1 2 3]
+\end{verbatim}
+  \end{block}
+  \begin{itemize}
+  \item Effiziente Baum-Implementierung
+  \item Keine vollständige Kopie nötig
+  \item ``$O(log_{32}(n))$ is good enough''
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Warum Immutability?}
+  \begin{itemize}
+  \item ``Referenzielle Transparenz'' von Funktionen
+    \begin{itemize}
+    \item Verhalten komplett durch Ein- und Ausgabe beschrieben
+    \item Gute Modularität
+    \item Einfach zu Testen
+    \end{itemize}
+  \item Mehr State $=>$ Mehr Kopplung von Modulen $=>$ mehr Bugs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Stream-Verarbeitung}
+  \begin{itemize}
+  \item Alle Clojure-Datenstrukturen implementieren Seq-Interface
+  \item Lazy Verarbeitung von Streams
+  \end{itemize}
+  \begin{block}{}
+\begin{verbatim}
+(map inc [1 2 3])         ; => [4 5 6]
+
+(for [[k v] walter]
+  (str (name k) ": " v))  ; => ("first-name: Walter"
+                                "familiy-name: White")
+
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Stream-Verarbeitung (2)}
+  \begin{block}{}
+\begin{verbatim}
+(def cart-items
+  [{:title "Bread",    :available? true,  :price 3}
+   {:title "Bananas",  :available? false, :price 2}
+   {:title "Notebook", :available? true,  :price 499}])
+
+(->> cart-items
+     (filter :available?)
+     (map :price)
+     (reduce +))                 ; 502
+
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{State in Clojure}
+  \begin{itemize}
+  \item ``Clojure ist kein Haskell''
+  \item State ist möglich - jede Funktion darf alles mutierbare mutieren
+    \begin{itemize}
+    \item Z.B. auch per Java-Interop
+    \end{itemize}
+  \item Verschiedene Arten State zu verwalten
+  \item klare Multithreading-Semantik
+  \end{itemize}
+  \begin{block}{Atoms - synchroner Zugriff mit atomaren Updates}
+\begin{verbatim}
+(def state (atom 3))
+
+(println @state)         ; => 3
+
+(swap! state + 4)
+
+(println @state)         ; => 7
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}{Weitere Referenztypen}
+  \begin{itemize}
+  \item Agents
+    \begin{itemize}
+    \item asynchroner Zugriff
+    \end{itemize}
+  \item Refs
+    \begin{itemize}
+    \item Software Transactional Memory
+    \item Mehrere refs können transaktional geupdated werden
+    \item Aber: Meist reichen Atoms
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Nebenläufigkeit mit core.async}
+
+\section{Reactive UI Programmierung mit Reagent in ClojureScript}
+\end{document}
