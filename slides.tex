@@ -10,6 +10,7 @@
 \usepackage{rotating}
 \usepackage[normalem]{ulem}
 \usepackage{amsmath}
+\usepackage{listings}
 \usepackage{textcomp}
 \usepackage{marvosym}
 \usepackage{wasysym}
@@ -18,8 +19,10 @@
 \tolerance=1000
 \usetheme{Warsaw}
 \author{Benjamin Teuber}
+\def\cpp{C++}
 \date{\today}
 \title{Clojure-Einführung}
+\institute{\cpp{}-Meetup Hamburg}
 \begin{document}
 
 \maketitle
@@ -27,7 +30,7 @@
 \tableofcontents
 \end{frame}
 
-\def\cpp{C++}
+
 
 \section{Clojure-Einführung}
 
@@ -355,6 +358,71 @@ v                         ; => [1 2 3]
   \end{block}
 \end{frame}
 
+\begin{frame}[fragile]{Wie ist core.async implementiert?}
+  \begin{itemize}
+  \item \lstinline{go} ist ein neues Sprachkonstrukt
+  \item Code wird in eine State Machine transformiert
+  \item Dennoch ist core.async nur eine Library
+  \item Wie ist das möglich?
+  \end{itemize}
+\end{frame}
 
-\section{Reactive UI Programmierung mit Reagent in ClojureScript}
+\begin{frame}[fragile]{Makros}
+  \begin{itemize}
+  \item Wie alle Lisps besitzt Clojure Makros
+  \item Ähnlich C-Präprozessor \lstinline{#define}
+  \item Aber:
+    \begin{itemize}
+    \item Dank einheitlicher Syntax weniger problemanfällig
+    \item Makros können kompletten Clojure-Sprachumfang nutzen
+    \item Metaprogrammierung ist nur Verarbeitung von Listen
+    \end{itemize}
+  \item Im Normalfall benötigt man aber keine Makros
+    \begin{itemize}
+    \item Meist overkill
+    \item Funktionen sind besser komponierbar
+    \item Nur wenn man wirklich die Programmiersprache erweitern möchte
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Reaktive UI Programmierung mit ClojureScript}
+
+\begin{frame}{Reaktive UI-Programmierung}
+  \begin{itemize}
+  \item Meine derzeitige Lieblingsanwendung von Clojure
+  \item Ideal für Single-Page Web Apps
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{React und Reagent}
+  \begin{itemize}
+  \item React
+    \begin{itemize}
+    \item JavaScript-Library von Facebook
+    \item übernimmt State-View-Synchronisierung
+    \item Vorteil: Man legt nur einmal fest wie State gerendert wird
+    \item HTML output kann in JS per JSX eingebettet
+    \item Unter der Haube: Virtual Dom für effiziente Updates
+    \end{itemize}
+  \item reagent
+    \begin{itemize}
+    \item Eleganter ClojureScript-Wrapper um React
+    \item Components sind einfach Funktionen
+    \item HTML wird einfach als Vektoren repräsentiert
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Demo: Reagent}
+  Zeit für eine Live-Demo!
+\end{frame}
+
+\begin{frame}{Schluss}
+  \begin{itemize}
+  \item Vielen Dank für die Aufmerksamkeit!
+  \item Zeit für Fragen
+  \end{itemize}
+\end{frame}
+
 \end{document}
