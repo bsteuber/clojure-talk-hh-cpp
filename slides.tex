@@ -68,7 +68,7 @@
   \begin{itemize}
   \item Viel Flexibilität
     \begin{itemize}
-    \item Es gibt Konstrukte die schwer oder gar nicht statisch zu typisieren sind
+    \item Es gibt Konstrukte die schwer zu typisieren sind
     \end{itemize}
   \item Wenig Tippaufwand
   \end{itemize}
@@ -81,13 +81,11 @@
     \item Unit Tests helfen hier
     \end{itemize}
   \item Performance-Einbußen
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Performance}
-  \begin{itemize}
-  \item Generell: Programmer Time $>$ Running Time
-  \item ca. Faktor 2-3 langsamer (TODO) als C++
+    \begin{itemize}
+    \item Aber: Type hints für Compiler möglich
+    \item Optimierter Code mit Java vergleichbar
+    \item Generell: Programmer Time $>$ Running Time
+    \end{itemize}
   \end{itemize}
 \end{frame}
 
@@ -183,9 +181,6 @@ int my_add(int x, int y) {
   (get walter :first-name)         ; => "Walter"
   (walter :first-name)             ; => "Walter"
   (:first-name walter)             ; => "Walter"
-
-  (walter :middle-name)            ; => nil
-  (walter :middle-name :not-found) ; => nil
 \end{verbatim}
 
   \end{block}
@@ -231,7 +226,7 @@ v                         ; => [1 2 3]
   \end{itemize}
   \begin{block}{}
 \begin{verbatim}
-(map inc [1 2 3])         ; => [4 5 6]
+(map inc [1 2 3])         ; => (2 3 4)
 
 (for [[k v] walter]
   (str (name k) ": " v))  ; => ("first-name: Walter"
@@ -268,7 +263,13 @@ v                         ; => [1 2 3]
   \item Verschiedene Arten State zu verwalten
   \item klare Multithreading-Semantik
   \end{itemize}
-  \begin{block}{Atoms - synchroner Zugriff mit atomaren Updates}
+\end{frame}
+
+\begin{frame}[fragile]{Atoms}
+  \begin{itemize}
+  \item häufigster Referenztyp
+  \item synchroner Zugriff mit atomaren Updates
+  \end{itemize}
 \begin{verbatim}
 (def state (atom 3))
 
@@ -278,7 +279,6 @@ v                         ; => [1 2 3]
 
 (println @state)         ; => 7
 \end{verbatim}
-  \end{block}
 \end{frame}
 
 \begin{frame}{Weitere Referenztypen}
@@ -325,7 +325,7 @@ v                         ; => [1 2 3]
 \begin{verbatim}
 (defn consumer [ch]
   (go
-    (loop
+    (loop []
       (println (<! ch))
       (recur))))
 
@@ -386,7 +386,7 @@ v                         ; => [1 2 3]
   \end{itemize}
 \end{frame}
 
-\section{Reaktive UI Programmierung mit ClojureScript}
+\section{Reaktive Web-Programmierung}
 
 \begin{frame}{Reaktive UI-Programmierung}
   \begin{itemize}
@@ -405,7 +405,7 @@ v                         ; => [1 2 3]
     \item HTML output kann in JS per JSX eingebettet
     \item Unter der Haube: Virtual Dom für effiziente Updates
     \end{itemize}
-  \item reagent
+  \item Reagent
     \begin{itemize}
     \item Eleganter ClojureScript-Wrapper um React
     \item Components sind einfach Funktionen
@@ -414,8 +414,117 @@ v                         ; => [1 2 3]
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Demo: Reagent}
-  Zeit für eine Live-Demo!
+\begin{frame}[fragile]{HTML in Vektorschreibweise}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{HTML}
+\begin{verbatim}
+<body>
+  <h1>Hello, World</h1>
+  <a href="/content">
+    Content
+  </a>
+</body>
+\end{verbatim}
+      \end{block}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \begin{block}{Reagent}
+\begin{verbatim}
+[:body
+  [:h1 "Hello, World"]
+  [:a {:href "/content"}
+    "Content"]]
+
+
+\end{verbatim}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Eine Reagent-Komponente}
+  \begin{block}{joke-list}
+\begin{verbatim}
+(defn joke-list [jokes delete-joke]
+  [:ul
+   (map-indexed
+    (fn [index joke]
+      (joke-entry index joke delete-joke))
+    jokes)])
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Eine Reagent-Komponente (2)}
+  \begin{block}{joke-entry}
+\begin{verbatim}
+(defn joke-entry [index joke delete-joke]
+  ^{:key index}
+  [:li joke
+   [:button {:on-click #(delete-joke index)}
+    "Delete"]])
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Eine Reagent-Komponente (3)}
+  \begin{block}{delete-joke}
+\begin{verbatim}
+(defn delete-joke [jokes index]
+  (let [before (take index jokes)
+        after  (drop (inc index) jokes)
+        jokes' (concat before after)]
+    (into [] jokes')))
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\begin{frame}[fragile]{Eine Reagent-Komponente (4)}
+  \begin{block}{jokes-with-state}
+\begin{verbatim}
+(defn jokes-with-state []
+  (let [state (reagent/atom ["Funny"
+                             "Very funny indeed!"
+                             "Even funnier"])
+        on-delete (fn [index]
+                    (swap! state delete-joke index))]
+    (fn []
+      [joke-list @state on-delete])))
+\end{verbatim}
+  \end{block}
+\end{frame}
+
+\section{Schluss}
+
+\begin{frame}{Fazit (1)}
+  Vorteile von Clojure
+  \begin{itemize}
+  \item Einfachheit und Eleganz
+  \item Modularität durch pure Funktionen
+  \item ``Data-driven programming''
+  \item Mächtige Metaprogrammierung wenn nötig
+  \item Kann alle neuen Ideen schnell kopieren
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Fazit (2)}
+  Nachteile von Clojure
+  \begin{itemize}
+  \item Error Messages
+  \item Tooling
+  \item Performance
+  \item Typsicherheit nur durch Testdisziplin herstellbar
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Fazit (3)}
+  Meine persönliche Erfahrung mit Clojure
+  \begin{itemize}
+  \item Came for the Metaprogramming
+  \item Stayed for the simplicity
+  \item Setze Clojure(Script) erfolgreich in Projekten ein
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Schluss}
